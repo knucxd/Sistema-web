@@ -1,0 +1,55 @@
+unit Unit1;
+
+interface
+
+uses
+  Classes, SysUtils, IWAppForm, IWApplication, IWColor, IWTypes, IWVCLComponent,
+  IWBaseLayoutComponent, IWBaseContainerLayout, IWContainerLayout,
+  IWTemplateProcessorHTML, Vcl.Controls, IWVCLBaseControl, IWBaseControl,
+  IWBaseHTMLControl, IWControl, IWCompButton, FireDAC.Stan.Intf,
+  FireDAC.Stan.Option, FireDAC.Stan.Error, FireDAC.UI.Intf, FireDAC.Phys.Intf,
+  FireDAC.Stan.Def, FireDAC.Stan.Pool, FireDAC.Stan.Async, FireDAC.Phys,
+  FireDAC.VCLUI.Wait, FireDAC.Phys.MySQLDef, FireDAC.Stan.Param, FireDAC.DatS,
+  FireDAC.DApt.Intf, FireDAC.DApt, Data.DB, FireDAC.Comp.DataSet,
+  FireDAC.Comp.Client, FireDAC.Phys.MySQL, IWCompEdit;
+
+type
+  Tfrmprodutos = class(TIWAppForm)
+    IWTemplateProcessorHTML1: TIWTemplateProcessorHTML;
+    btn_novo: TIWButton;
+    FDConnection1: TFDConnection;
+    driver: TFDPhysMySQLDriverLink;
+    querry_pro: TFDQuery;
+    ds_querry_pro: TDataSource;
+    txtbuscar: TIWEdit;
+    procedure IWTemplateProcessorHTML1UnknownTag(const AName: string;
+      var VValue: string);
+  public
+  end;
+
+implementation
+
+{$R *.dfm}
+
+
+procedure Tfrmprodutos.IWTemplateProcessorHTML1UnknownTag(const AName: string;
+  var VValue: string);
+begin
+
+  if AName = 'gridprodutos' then
+  begin
+
+  querry_pro.Active:= true;
+  querry_pro.Close;
+  querry_pro.SQL.Clear;
+  querry_pro.SQL.Add('SELECT p.id, pnome, p.valor, p.quantidade, p.id_fornecedor, f.nome as nome FROM produtos as p INNER JOIN fornecedores as f or p.id_fornecedor=f.id where p.nome LIKE :nome order by p.nome asc');
+  querry_pro.ParamByName('nome').Value := txtbuscar.text + '%';
+  querry_pro.Open();
+  end;
+
+end;
+
+initialization
+  Tfrmprodutos.SetAsMainForm;
+
+end.
